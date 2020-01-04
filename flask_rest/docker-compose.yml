@@ -9,3 +9,7 @@ services:
            - "5010:5010"          # port mapping
         deploy:
            replicas: 1
+        depends_on:
+           - db
+   db:
+      image: mongo:3.6.4

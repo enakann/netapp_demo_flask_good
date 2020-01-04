@@ -1,36 +1,53 @@
 from flask import Flask,request,jsonify,render_template
 from flask_restful import Api,Resource
+from pymongo import MongoClient
 import copy
+from bson import json_util
+import json
+
+client=MongoClient("mongodb://db:27017")
+db=client.directorsDB
+directorCollection = db['director']
 
 app=Flask(__name__)
 
 api=Api(app)
 
-storecontents=[
-    {
-        "name":"QuentinTorantino",
-        "movies":["kill bill","reservoir dogs"],
-    },
-    {
-        "name":"David Fincher",
-        "movies":["fight club","social network"]
-    }
-   ]
 
-def geturl_fordata(ls):
-    copy_ls=copy.deepcopy(ls)
+import json
+from bson import ObjectId
+
+class JSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        return json.JSONEncoder.default(self, o)
+
+
+def geturl_fordata():
     newcontent=[]
-    for item in copy_ls:
-        item["url"]="http://10.193.113.101:5010/directors/{}".format(item["name"])
-        newcontent.append(item)
+    #import pdb;pdb.set_trace()
+    data=directorCollection.find()
+    if not data:
+       return None
+    for item in data:
+        #item.pop('_id')
+        new_item={}
+        new_item['_id']=str(item['_id'])
+        new_item["url"]="http://10.193.113.101:5010/directors/{}".format(item["name"])
+        new_item['name']=item['name']
+        new_item['movies']=item['movies']
+        newcontent.append(new_item)
     return newcontent
 
 
 
 class Directors(Resource):
     def get(self):
-        new_storecontents = geturl_fordata(storecontents)
-        return jsonify({"storecontents":[ x for x in new_storecontents]})
+        new_storecontents = geturl_fordata()
+        if not new_storecontents:
+            return {'status':404}
+        return jsonify({"directors":[ x for x in new_storecontents]})
 
     def post(self):
         data=request.get_json()
@@ -39,23 +56,29 @@ class Directors(Resource):
             "name":data['name'],
             "movies":[]
         }
-        storecontents.append(new_director)
-        return {"status":200,"data":new_director}
+        directorCollection.insert_one(new_director)    
+        #return {"status":200,"data":json.dumps(new_director, indent=4, default=json_util.default)}
+        return {'status':201}
 
 
 class Director(Resource):
 
     def get(self,name):
-        director = [x for x in storecontents if x["name"] == name][0]
-        return jsonify({"stauts":200,"data":director})
+        director=directorCollection.find_one({'name':name})
+        if not director:
+           return {'status':404}
+        new_director={}
+        new_director['name']=director['name']
+        new_director['movies']=director['movies']
+        #new_director['_id']=
+        
+        return jsonify({"stauts":200,"data":new_director})
 
     def post(self,name):
         item=request.get_json()
         movie=item['movie']
-        for dirctr in storecontents:
-            if dirctr["name"]==name:
-                dirctr["movies"].append(movie)
-                return jsonify({"status":200})
+        directorCollection.update({'name':name},{'$push':{'movies':movie}})
+        return jsonify({"status":'201'})
 
 
 
