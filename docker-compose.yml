@@ -1,4 +1,4 @@
-version: '3'
+version: '3.1'
 services:
     directors_web_app:
        build:
@@ -19,7 +19,7 @@ services:
     db:
        image: mongo:3.6.4
        volumes:
-         - ./mongo/data:/data/db
+         - mongodb:/data/db
     nginx:
        build:
          context: ./nginx
@@ -30,3 +30,7 @@ services:
        depends_on:
          - directors_web_app
          - directors_rest_api
+volumes:
+   mongodb:
+      external: false
+

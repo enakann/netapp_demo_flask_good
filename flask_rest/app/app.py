@@ -34,7 +34,7 @@ def geturl_fordata():
         #item.pop('_id')
         new_item={}
         new_item['_id']=str(item['_id'])
-        new_item["url"]="http://10.193.113.101:5010/directors/{}".format(item["name"])
+        new_item["url"]="http://10.193.113.101/directors/{}".format(item["name"])
         new_item['name']=item['name']
         new_item['movies']=item['movies']
         newcontent.append(new_item)
