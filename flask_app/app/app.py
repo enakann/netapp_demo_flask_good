@@ -1,7 +1,7 @@
 from flask import Flask,render_template,send_file
 import os
 from pymongo import MongoClient
-
+import socket
 client=MongoClient("mongodb://db:27017")
 db=client.directorsDB
 directorCollection = db['director']
@@ -18,6 +18,7 @@ def web_home():
         new_item['name']=item['name']
         new_item['movies']=item['movies']
         directors.append(new_item)    
+    directors.append({"host":str(socket.gethostname())})
     return render_template("index.html",directors=directors)
 
 
