@@ -18,6 +18,8 @@ services:
          - db
     db:
        image: mongo:3.6.4
+       volumes:
+         - ./mongo/data:/data/db
     nginx:
        build:
          context: ./nginx
