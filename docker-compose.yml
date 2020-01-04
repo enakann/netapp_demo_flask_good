@@ -1,0 +1,18 @@
+version: '3'
+services:
+    directors_web_app:
+       build:
+         context: ./flask_app
+         dockerfile: Dockerfile
+       ports:
+         - "5011:5000"
+    directors_rest_api:
+       build:
+         context: ./flask_rest
+         dockerfile: Dockerfile
+       ports:
+         - "5010:5000"
+       depends_on:
+         - db
+    db:
+       image: mongo:3.6.4

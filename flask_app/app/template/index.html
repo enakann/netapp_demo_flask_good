@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<head>
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
+
+</head>
+<body>
+{%for director in directors%}
+    <table style="width:100%" border=5px>
+    <th>{{director.name}}</th>
+     {% for movie in director.movies%}
+         <tr>
+         <td>{{movie}}</td>
+          </tr>
+     {%endfor%}
+    </table>
+{%endfor%}
+
+</body>
+</html>
