@@ -1,0 +1,11 @@
+version: '3'
+services:
+   flask_app:                     # service name
+        build:                    # we can give Dockerfile or the image name if its already build
+          context: .
+          dockerfile: Dockerfile
+        command: python ./app/app.py    # Entry point command can be overrided here
+        ports:
+           - "5010:5010"          # port mapping
+        deploy:
+           replicas: 1
